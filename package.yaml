@@ -1,0 +1,44 @@
+name:                polling-cache
+version:             0.1.0.0
+github:              "jkaye2012/polling-cache"
+license:             BSD3
+author:              "Jordan Kaye"
+maintainer:          "jordan.kaye2@gmail.com"
+copyright:           "2021 Jordan Kaye"
+
+extra-source-files:
+  - README.org
+  - ChangeLog.org
+
+description: Please see the project on GitHub at <https://github.com/jkaye2012/polling-cache>
+
+ghc-options:
+  - -Wall
+  - -Werror
+  - -Widentities
+  - -Wincomplete-record-updates
+  - -Wincomplete-patterns
+  - -Wincomplete-uni-patterns
+  - -Wpartial-fields
+  - -Wredundant-constraints
+
+dependencies:
+  - base >= 4.7 && < 5
+  - containers >= 0.6.2.0 && < 1
+  - stm >= 2.4.0 && < 3
+  - time >= 1.9.3 && < 2
+  - unliftio >= 0.2.0 && < 1
+
+library:
+  source-dirs: src
+
+tests:
+  polling-cache-test:
+    main:                Spec.hs
+    source-dirs:         test
+    dependencies:
+      - polling-cache
+    ghc-options:
+      - -threaded
+      - -rtsopts
+      - -with-rtsopts=-N

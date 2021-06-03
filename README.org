@@ -1,0 +1,7 @@
+* polling-cache
+
+  polling-cache is a simple library meant to facilitate polling for reliability and performance in distributed systems.
+
+  More information about the concepts underlying the library can be found on [[https://jordankaye.dev/posts/polling-for-relability][my development blog]].
+
+  Detailed technical documentation for the library can be found on [[https://hackage.haskell.org/package/polling-cache][Hackage]].

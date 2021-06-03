@@ -1,0 +1,18 @@
+#    -*- mode: org -*-
+
+
+Archived entries from file /home/jkaye/git/polling-cache/README.org
+
+
+* polling-cache
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2021-01-31 Sun 07:58
+  :ARCHIVE_FILE: ~/git/polling-cache/README.org
+  :ARCHIVE_CATEGORY: README
+  :END:
+
+  polling-cache is a simple library meant to facilitate polling for reliability and performance in distributed systems.
+
+  More information about the concepts underlying the library can be found on [[https://jordankaye.dev/posts/polling-for-relability][my development blog]].
+
+  Detailed technical documentation for the library can be found on [[https://hackage.haskell.org/package/polling-cache][Hackage]].

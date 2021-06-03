@@ -1,0 +1,7 @@
+cradle:
+  stack:
+    - path: "./src"
+      component: "polling-cache:lib"
+
+    - path: "./test"
+      component: "polling-cache:test:polling-cache-test"
