@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 758b0778edf869b42d7b02de3186dac34981474fdac285256e25107bf7f3001b
+-- hash: d81adaa659284cbec91636207f5821f6a79e532b1e7d245c6630352954672467
 
 name:           polling-cache
 version:        0.1.0.0
@@ -27,8 +27,7 @@ source-repository head
 
 library
   exposed-modules:
-      Data.Cache.Polling.Class
-      Data.Cache.Polling.Instances
+      Data.Cache.Polling
       Lib
   other-modules:
       Paths_polling_cache
@@ -36,11 +35,10 @@ library
       src
   ghc-options: -Wall -Werror -Widentities -Wincomplete-record-updates -Wincomplete-patterns -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints
   build-depends:
-      base >=4.7 && <5
-    , containers >=0.6.2.0 && <1
-    , stm >=2.4.0 && <3
-    , time >=1.9.3 && <2
-    , unliftio >=0.2.0 && <1
+      base
+    , stm
+    , time
+    , unliftio
   default-language: Haskell2010
 
 test-suite polling-cache-test
@@ -52,10 +50,9 @@ test-suite polling-cache-test
       test
   ghc-options: -Wall -Werror -Widentities -Wincomplete-record-updates -Wincomplete-patterns -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      base >=4.7 && <5
-    , containers >=0.6.2.0 && <1
+      base
     , polling-cache
-    , stm >=2.4.0 && <3
-    , time >=1.9.3 && <2
-    , unliftio >=0.2.0 && <1
+    , stm
+    , time
+    , unliftio
   default-language: Haskell2010

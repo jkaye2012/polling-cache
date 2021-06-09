@@ -1,6 +1,6 @@
 module Lib
-    ( someFunc
-    ) where
+  ( module Data.Cache.Polling,
+  )
+where
 
-someFunc :: IO ()
-someFunc = putStrLn "someFunc"
+import Data.Cache.Polling
