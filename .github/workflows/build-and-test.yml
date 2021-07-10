@@ -1,5 +1,5 @@
 name: build-and-test
-on: [push]
+on: [push, pull_request]
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -13,3 +13,4 @@ jobs:
           stack-no-global: true
           stack-setup-ghc: true
       - run: stack build
+      - run: stack test
