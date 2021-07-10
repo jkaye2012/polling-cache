@@ -1,7 +1,7 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE RecordWildCards #-}
 
-module FailureSpec (spec) where
+module PollingCacheSpec (spec) where
 
 import Control.Concurrent
 import Control.Exception
