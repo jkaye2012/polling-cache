@@ -24,6 +24,7 @@ ghc-options:
 
 dependencies:
   - base
+  - exceptions
   - stm
   - time
   - unliftio
@@ -37,6 +38,10 @@ tests:
     source-dirs:         test
     dependencies:
       - polling-cache
+      - hspec
+      - hspec-discover
+      - mtl
+      - transformers
     ghc-options:
       - -threaded
       - -rtsopts

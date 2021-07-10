@@ -1,10 +1,10 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.33.0.
+-- This file has been generated from package.yaml by hpack version 0.34.4.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: d81adaa659284cbec91636207f5821f6a79e532b1e7d245c6630352954672467
+-- hash: 4857e7c0e6b683eb07530d8ab656c5f10ab1c059016f1783028dde67e4f3bfa7
 
 name:           polling-cache
 version:        0.1.0.0
@@ -27,6 +27,8 @@ source-repository head
 
 library
   exposed-modules:
+      Data.Cache
+      Data.Cache.Internal
       Data.Cache.Polling
       Lib
   other-modules:
@@ -36,6 +38,7 @@ library
   ghc-options: -Wall -Werror -Widentities -Wincomplete-record-updates -Wincomplete-patterns -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints
   build-depends:
       base
+    , exceptions
     , stm
     , time
     , unliftio
@@ -45,14 +48,20 @@ test-suite polling-cache-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
+      PollingCacheSpec
       Paths_polling_cache
   hs-source-dirs:
       test
   ghc-options: -Wall -Werror -Widentities -Wincomplete-record-updates -Wincomplete-patterns -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base
+    , exceptions
+    , hspec
+    , hspec-discover
+    , mtl
     , polling-cache
     , stm
     , time
+    , transformers
     , unliftio
   default-language: Haskell2010
