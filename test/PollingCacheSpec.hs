@@ -30,16 +30,14 @@ instance MonadCache (StateT TestState IO) where
     let diff = realToFrac us
     st@TestState {..} <- get
     put $ st {now = addUTCTime diff now}
-  newThread act = go
+  repeatedly act = go
     where
       step st@TestState {..} = st {numIterations = numIterations + 1}
       go = do
         withStateT step act
         TestState {..} <- get
-        if numIterations >= maxIterations
-          then lift myThreadId
-          else go
-  repeatedly = id
+        when (numIterations < maxIterations) go
+  newThread act = act >> lift myThreadId
   killCache _ = return ()
 
 testDay :: Day
