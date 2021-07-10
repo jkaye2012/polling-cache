@@ -14,3 +14,4 @@ jobs:
           stack-setup-ghc: true
       - run: stack build
       - run: stack test
+      - run: stack haddock
