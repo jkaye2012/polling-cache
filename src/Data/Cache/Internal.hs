@@ -8,6 +8,7 @@ module Data.Cache.Internal
 where
 
 import Control.Concurrent
+import Control.Monad (forever)
 import Control.Monad.Catch
 import Control.Monad.IO.Class
 import Data.Time
@@ -25,6 +26,9 @@ class (MonadCatch m, MonadIO m) => MonadCache m where
   -- | Spawn a new thread of execution to run an action.
   newThread :: m () -> m ThreadId
 
+  -- | Run an action forever.
+  repeatedly :: m () -> m ()
+
   -- | Stop a thread of execution. The thread can be assumed to have been started using 'newThread'.
   killCache :: ThreadId -> m ()
 
@@ -32,4 +36,5 @@ instance MonadCache IO where
   currentTime = getCurrentTime
   delay = threadDelay
   newThread = forkIO
+  repeatedly = forever
   killCache = killThread

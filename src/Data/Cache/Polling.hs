@@ -24,7 +24,7 @@ module Data.Cache.Polling
 where
 
 import Control.Concurrent
-import Control.Monad (when)
+import Control.Monad (unless)
 import qualified Control.Monad.Catch as Exc
 import Data.Cache.Internal
 import Data.Functor ((<&>))
@@ -90,25 +90,25 @@ data FailureMode
     EvictAfterTime NominalDiffTime
   deriving (Eq, Show)
 
-notFailed :: CacheResult a -> Bool
-notFailed (Left (LoadFailed _)) = False
-notFailed _ = True
+isFailed :: CacheResult a -> Bool
+isFailed (Left (LoadFailed _)) = True
+isFailed _ = False
 
-cacheFailed :: MonadCache m => CachePayload a -> UTCTime -> m ()
-cacheFailed payload = atomically . writeTVar payload . Left . LoadFailed
+writeCacheFailure :: MonadCache m => CachePayload a -> UTCTime -> m ()
+writeCacheFailure payload = atomically . writeTVar payload . Left . LoadFailed
 
 handleFailure :: MonadCache m => FailureMode -> CachePayload a -> m ()
 handleFailure Ignore _ = return ()
 handleFailure EvictImmediately payload = do
   now <- currentTime
   current <- readTVarIO payload
-  when (notFailed current) $ cacheFailed payload now
+  unless (isFailed current) $ writeCacheFailure payload now
 handleFailure (EvictAfterTime limit) payload = do
   previousResult <- readTVarIO payload
   now <- currentTime
   let failed = previousResult <&> snd <&> (\prev -> diffUTCTime now prev >= limit)
   case failed of
-    Right True -> cacheFailed payload now
+    Right True -> writeCacheFailure payload now
     _ -> return ()
 
 -- | Creates a new 'PollingCache'.
@@ -123,7 +123,7 @@ newPollingCache microseconds mode generator = do
   return $ PollingCache tvar tid
   where
     cacheThread :: CachePayload a -> m ()
-    cacheThread tvar = do
+    cacheThread tvar = repeatedly $ do
       (result :: Either SomeException a) <- Exc.try generator
       case result of
         Left _ -> handleFailure mode tvar

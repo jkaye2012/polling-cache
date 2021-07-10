@@ -10,6 +10,7 @@ import Control.Monad.Trans
 import Control.Monad.Trans.State.Strict
 import Data.Cache.Polling
 import Data.Either (isRight)
+import Data.Functor ((<&>))
 import Data.Time
 import Data.Time.Calendar.OrdinalDate
 import Test.Hspec
@@ -38,6 +39,7 @@ instance MonadCache (StateT TestState IO) where
         if numIterations >= maxIterations
           then lift myThreadId
           else go
+  repeatedly = id
   killCache _ = return ()
 
 testDay :: Day
@@ -109,9 +111,18 @@ basicFunctionalitySpec =
     describe "IO actions" $ do
       it "will be executed in a background thread" $ do
         cache <- newPollingCache 1 Ignore alwaysSucceedsIO
-        threadDelay 10
+        threadDelay 100
         val <- cachedValues cache
         val `shouldSatisfy` isRight
+        stopPolling cache
+
+      it "will execute repeatedly" $ do
+        cache <- newPollingCache 1 Ignore alwaysSucceedsIO
+        threadDelay 100
+        firstVal <- cachedValues cache
+        threadDelay 100
+        secondVal <- cachedValues cache
+        (firstVal <&> snd) `shouldNotBe` (secondVal <&> snd)
         stopPolling cache
 
 ignoreSpec :: Spec
