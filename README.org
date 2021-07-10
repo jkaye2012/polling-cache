@@ -6,7 +6,7 @@
 
   Detailed technical documentation for the library can be found on [[https://hackage.haskell.org/package/polling-cache][Hackage]] (coming soon).
 
-  [[https://github.com/jkaye2012/polling-cache/actions/workflows/build-and-test.yml/badge.svg][Automated Checks]]
+  #+html: <p><img src="https://github.com/jkaye2012/polling-cache/actions/workflows/build-and-test.yml/badge.svg" /></p>
 
 ** Quick start guide
 
