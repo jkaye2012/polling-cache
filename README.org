@@ -8,8 +8,6 @@
 
 ** Quick start guide
 
-*** Warning
-
    *IMPORTANT!* Before attempting to use this library, it's pivotal to understand your use case and whether simple polling is a reasonable solution.
    Polling is a strategy generally suitable only for data that must be updated with a relatively low frequency, and for which
    periodic failures to update are not catastrophic to the application. Attempting to use polling for data that is expensive to generate or
@@ -36,12 +34,15 @@
       import Control.Concurrent
       import Data.Cache.Polling
 
+      -- In "real" code, this generator would likely hit a database or service endpoint of some kind.
+      -- Any exception thrown from the generator is handled by the CacheResult (see API documentation for details).
       dataGenerator :: IO String
       dataGenerator = return "Very nice data"
 
       main :: IO ()
       main = do
-        cache <- newPollingCache 3600000000 Ignore dataGenerator -- 3600000000 microseconds = 1 hour delay between invocations of the generator, ignore failures
+        -- 3600000000 microseconds = 1 hour delay between invocations of the generator, ignore failures
+        cache <- newPollingCache 3600000000 Ignore dataGenerator
         threadDelay 100 -- Give the runtime a bit of time to execute the action in the background
         latestResult <- cachedValues cache
         print latestResult
