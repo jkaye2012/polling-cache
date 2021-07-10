@@ -1,0 +1,15 @@
+name: build-and-test
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: haskell/actions/setup@v1
+        with:
+          ghc-version: '8.10.4'
+          enable-stack: true
+          stack-version: 'latest'
+          stack-no-global: true
+          stack-setup-ghc: true
+      - run: stack build
