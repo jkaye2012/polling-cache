@@ -25,6 +25,7 @@ ghc-options:
 dependencies:
   - base
   - exceptions
+  - random
   - stm
   - time
   - unliftio

@@ -1,5 +1,6 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE ScopedTypeVariables #-}
+{-# OPTIONS_GHC -Wno-unused-record-wildcards #-}
 
 -- | A cache implementation that periodically (and asynchronously) polls an external action for updated values.
 module Data.Cache.Polling
@@ -14,9 +15,12 @@ module Data.Cache.Polling
 
     -- * Types for cache creation
     FailureMode (..),
+    DelayMode (..),
     ThreadDelay,
+    CacheOptions (delayMode, failureMode, delayFuzzing),
 
     -- * Functions for creating and interacting with caches
+    basicOptions,
     newPollingCache,
     cachedValues,
     stopPolling,
@@ -68,28 +72,6 @@ data PollingCache a = PollingCache
 -- | The minimum amount of time (in microseconds) that should pass before a cache reload is attempted.
 type ThreadDelay = Int
 
--- | The supported failure handling modes for a 'PollingCache' instance.
---
--- In the context of the cache action, "failure" means an Exception thrown from
--- the user-supplied action that generates values to populate the cache.
---
--- Because these operations are performed in a background thread, the user must decide how failures are to be handled
--- upon cache creation.
-data FailureMode
-  = -- | Failures should be ignored entirely; the most relaxed failure handling strategy.
-    --
-    -- This means that 'LoadFailed' will never be populated as a cache result.
-    Ignore
-  | -- | If a failure occurs, any previously cached value is immediately evicted from the cache; the strictest failure handling strategy.
-    EvictImmediately
-  | -- | Failures will be ignored unless they persist beyond the supplied time span.
-    --
-    -- This is a middle-ground failure handling strategy that probably makes sense to use in most scenarios.
-    -- The nature of asynchronous polling implies that somewhat stale values are not an issue to the consumer;
-    -- therefore, allowing some level of transient failure can often improve reliability without sacrificing correctness.
-    EvictAfterTime NominalDiffTime
-  deriving (Eq, Show)
-
 isFailed :: CacheResult a -> Bool
 isFailed (Left (LoadFailed _)) = True
 isFailed _ = False
@@ -111,13 +93,40 @@ handleFailure (EvictAfterTime limit) payload = do
     Right True -> writeCacheFailure payload now
     _ -> return ()
 
+clamp :: Int -> Int -> Int -> Int
+clamp mn mx val
+  | val < mn = mn
+  | val > mx = mx
+  | otherwise = val
+
+handleDelay :: MonadCache m => DelayMode a -> Maybe Int -> Either SomeException a -> m ()
+handleDelay mode (Just fuzz) res = do
+  fuzzDelay <- randomize (0, fuzz)
+  delay fuzzDelay
+  handleDelay' mode res
+handleDelay mode Nothing res = handleDelay' mode res
+
+handleDelay' :: MonadCache m => DelayMode a -> Either SomeException a -> m ()
+handleDelay' (DelayForMicroseconds mics) _ = delay mics
+handleDelay' (DelayDynamically f) r = delay $ f r
+handleDelay' (DelayDynamicallyWithBounds (mn, mx) f) r =
+  delay . clamp mn mx $ f r
+
+-- | Create a 'CacheOptions' with basic functionality enabled.
+--
+-- Record update syntax can be use to further customize options created using this function:
+--
+-- > basicOpts = basicOptions (DelayForMicroseconds 60000000) EvictImmediately
+-- > customOpts = basicOpts { delayFuzzing = Just 100 }
+basicOptions :: DelayMode a -> FailureMode -> CacheOptions a
+basicOptions d f = CacheOptions d f Nothing
+
 -- | Creates a new 'PollingCache'.
 --
 -- The supplied action is used to generate values that are stored in the cache. The action is executed in the background
--- with a delay of at least 'ThreadDelay' microseconds between invocations.
--- The supplied 'FailureMode' determines how the cache will treat any Exceptions thrown by the supplied action.
-newPollingCache :: forall a m. MonadCache m => ThreadDelay -> FailureMode -> m a -> m (PollingCache a)
-newPollingCache microseconds mode generator = do
+-- with its delay, failure, and fuzzing behavior controlled by the provided 'CacheOptions'.
+newPollingCache :: forall a m. MonadCache m => CacheOptions a -> m a -> m (PollingCache a)
+newPollingCache CacheOptions {..} generator = do
   tvar <- newTVarIO $ Left NotYetLoaded
   tid <- newThread $ cacheThread tvar
   return $ PollingCache tvar tid
@@ -126,11 +135,11 @@ newPollingCache microseconds mode generator = do
     cacheThread tvar = repeatedly $ do
       (result :: Either SomeException a) <- Exc.try generator
       case result of
-        Left _ -> handleFailure mode tvar
+        Left _ -> handleFailure failureMode tvar
         Right value -> do
           now <- currentTime
           atomically . writeTVar tvar $ Right (value, now)
-      delay microseconds
+      handleDelay delayMode delayFuzzing result
 
 -- | Retrieve the current values from a 'PollingCache'.
 cachedValues :: MonadCache m => PollingCache a -> m (CacheResult a)

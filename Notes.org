@@ -1,0 +1,16 @@
+* Features to implement
+** Ability to invalidate the cache on-demand
+   - Force async refresh
+   - Invalidate and sync refresh?
+** Lazy fetching?
+   Currently, actions on run eagerly and are always run based upon the update timing interval.
+   Combined with more flexible update policies, it may be worth thinking about a lazy update policy
+   that runs based upon the client's interactions with the cache. E.g., if the cache has not been
+   accessed recently, it may not be worth running the action. There are some tricky considerations here
+   to ensure that data isn't too stale or that users aren't surprised by the behavior.
+
+* Design improvements
+** May be able to use MonadUnliftIO instead of MonadIO
+   MonadIO is used exclusively for its compatibility with StateT within tests.
+   One suggestion was to instead use ReaderT MVar for tests, which would allow the use of the
+   MonadUnliftIO constraint instead.

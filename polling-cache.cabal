@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 4857e7c0e6b683eb07530d8ab656c5f10ab1c059016f1783028dde67e4f3bfa7
+-- hash: 45d84a59fa5d185ce13aef3064dd63a0bfc444d44ec485b2888db60513c9841a
 
 name:           polling-cache
 version:        0.1.0.0
@@ -39,6 +39,7 @@ library
   build-depends:
       base
     , exceptions
+    , random
     , stm
     , time
     , unliftio
@@ -60,6 +61,7 @@ test-suite polling-cache-test
     , hspec-discover
     , mtl
     , polling-cache
+    , random
     , stm
     , time
     , transformers
