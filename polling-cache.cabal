@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 45d84a59fa5d185ce13aef3064dd63a0bfc444d44ec485b2888db60513c9841a
+-- hash: db7e897b30dc8355e34ab06bf09916bc1e16d2da5e6526a93b36f0ed255e15db
 
 name:           polling-cache
 version:        0.1.0.0
@@ -30,7 +30,6 @@ library
       Data.Cache
       Data.Cache.Internal
       Data.Cache.Polling
-      Lib
   other-modules:
       Paths_polling_cache
   hs-source-dirs:

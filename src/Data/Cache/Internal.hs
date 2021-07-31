@@ -49,7 +49,7 @@ instance MonadCache IO where
   repeatedly = forever
   killCache = killThread
 
--- | The supported delay modes for a 'PollingCache' instance.
+-- | The supported delay modes for a 'Data.Cache.PollingCache' instance.
 --
 -- The delay associated with a cache instance define the amount of time that will pass between
 -- cache refreshes.
@@ -68,7 +68,7 @@ data DelayMode a
     -- function, the delay period will never be below the lower bound or above the upper bound.
     DelayDynamicallyWithBounds (Int, Int) (Either SomeException a -> Int)
 
--- | The supported failure handling modes for a 'PollingCache' instance.
+-- | The supported failure handling modes for a 'Data.Cache.PollingCache' instance.
 --
 -- In the context of the cache action, "failure" means an Exception thrown from
 -- the user-supplied action that generates values to populate the cache.
@@ -78,7 +78,7 @@ data DelayMode a
 data FailureMode
   = -- | Failures should be ignored entirely; the most relaxed failure handling strategy.
     --
-    -- This means that 'LoadFailed' will never be populated as a cache result.
+    -- This means that 'Data.Cache.LoadFailed' will never be populated as a cache result.
     Ignore
   | -- | If a failure occurs, any previously cached value is immediately evicted from the cache; the strictest failure handling strategy.
     EvictImmediately
@@ -90,7 +90,7 @@ data FailureMode
     EvictAfterTime NominalDiffTime
   deriving (Eq, Show)
 
--- | Options that dictate the behavior of a 'PollingCache' instance.
+-- | Options that dictate the behavior of a 'Data.Cache.PollingCache' instance.
 data CacheOptions a = CacheOptions
   { -- | The 'DelayMode' to use.
     delayMode :: DelayMode a,
