@@ -1,3 +1,11 @@
 # Changelog for polling-cache
 
-## Unreleased changes
+* Unreleased changes
+
+* 0.0.1.0 | 2021-07-31
+** Added
+   - Initial public API
+     + 3 modes for handling polling delays
+     + 3 modes for handling polling failures
+   - Initial documentation
+   - Unit tests covering all core functionality
