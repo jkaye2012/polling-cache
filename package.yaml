@@ -1,10 +1,11 @@
-name:                polling-cache
-version:             0.0.1.0
-github:              "jkaye2012/polling-cache"
-license:             BSD3
-author:              "Jordan Kaye"
-maintainer:          "jordan.kaye2@gmail.com"
-copyright:           "2021 Jordan Kaye"
+name:       polling-cache
+version:    0.0.1.0
+github:     "jkaye2012/polling-cache"
+license:    BSD3
+author:     "Jordan Kaye"
+maintainer: "jordan.kaye2@gmail.com"
+copyright:  "2021 Jordan Kaye"
+category:   Cache,"Distributed Computing"
 
 extra-source-files:
   - README.org

@@ -4,11 +4,12 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: db7e897b30dc8355e34ab06bf09916bc1e16d2da5e6526a93b36f0ed255e15db
+-- hash: 559596990cc7fa95241fd4d4bea69f9783c497dffe4d598a15b17ae1deaa56c5
 
 name:           polling-cache
-version:        0.1.0.0
+version:        0.0.1.0
 description:    Please see the project on GitHub at <https://github.com/jkaye2012/polling-cache>
+category:       Cache,"Distributed Computing"
 homepage:       https://github.com/jkaye2012/polling-cache#readme
 bug-reports:    https://github.com/jkaye2012/polling-cache/issues
 author:         Jordan Kaye
