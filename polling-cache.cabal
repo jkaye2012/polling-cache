@@ -4,11 +4,12 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 559596990cc7fa95241fd4d4bea69f9783c497dffe4d598a15b17ae1deaa56c5
+-- hash: 3fd0d09d410dd3418bad090e7b55ec39886725f776f85a0b5440ecbbe15c7ffd
 
 name:           polling-cache
 version:        0.0.1.0
-description:    Please see the project on GitHub at <https://github.com/jkaye2012/polling-cache>
+synopsis:       Cache infrequently updated data for simpler distributed systems.
+description:    Cache infrequently updated data for simpler distributed systems. See <https://github.com/jkaye2012/polling-cache> for more details.
 category:       Cache,"Distributed Computing"
 homepage:       https://github.com/jkaye2012/polling-cache#readme
 bug-reports:    https://github.com/jkaye2012/polling-cache/issues

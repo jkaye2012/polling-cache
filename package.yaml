@@ -11,11 +11,11 @@ extra-source-files:
   - README.org
   - ChangeLog.org
 
-description: Please see the project on GitHub at <https://github.com/jkaye2012/polling-cache>
+description: Cache infrequently updated data for simpler distributed systems. See <https://github.com/jkaye2012/polling-cache> for more details.
+synopsis: Cache infrequently updated data for simpler distributed systems.
 
 ghc-options:
   - -Wall
-  - -Werror
   - -Widentities
   - -Wincomplete-record-updates
   - -Wincomplete-patterns
