@@ -47,7 +47,7 @@
         let opts = basicOptions (DelayForMicroseconds 3600000000) Ignore
         cache <- newPollingCache opts dataGenerator
         threadDelay 100 -- Give the runtime a bit of time to execute the action in the background
-        latestResult <- cachedValues cache
+        latestResult <- cachedValue cache
         print latestResult
         stopPolling cache -- Shut down and invalidate the cache
 

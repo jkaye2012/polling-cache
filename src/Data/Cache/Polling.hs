@@ -22,7 +22,7 @@ module Data.Cache.Polling
     -- * Functions for creating and interacting with caches
     basicOptions,
     newPollingCache,
-    cachedValues,
+    cachedValue,
     stopPolling,
   )
 where
@@ -142,8 +142,8 @@ newPollingCache CacheOptions {..} generator = do
       handleDelay delayMode delayFuzzing result
 
 -- | Retrieve the current values from a 'PollingCache'.
-cachedValues :: MonadCache m => PollingCache a -> m (CacheResult a)
-cachedValues = readTVarIO . mostRecentValues
+cachedValue :: MonadCache m => PollingCache a -> m (CacheResult a)
+cachedValue = readTVarIO . mostRecentValues
 
 -- | Stops the background processing thread associated with a 'PollingCache'.
 --
