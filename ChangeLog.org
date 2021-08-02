@@ -2,6 +2,10 @@
 
 * Unreleased changes
 
+* 0.0.1.0 | 2021-08-01
+** Changed
+   - cachedValues renamed to cachedValue to reflect that only a single value is cached
+
 * 0.0.1.0 | 2021-07-31
 ** Added
    - Initial public API
