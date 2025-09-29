@@ -1,6 +1,7 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# OPTIONS_GHC -Wno-unused-record-wildcards #-}
+{-# OPTIONS_GHC -Wno-name-shadowing #-}
 
 -- | A cache implementation that periodically (and asynchronously) polls an external action for updated values.
 module Data.Cache.Polling
@@ -22,6 +23,7 @@ module Data.Cache.Polling
     -- * Functions for creating and interacting with caches
     basicOptions,
     newPollingCache,
+    newPrefilledPollingCache,
     cachedValue,
     stopPolling,
   )
@@ -126,20 +128,42 @@ basicOptions d f = CacheOptions d f Nothing
 -- The supplied action is used to generate values that are stored in the cache. The action is executed in the background
 -- with its delay, failure, and fuzzing behavior controlled by the provided 'CacheOptions'.
 newPollingCache :: forall a m. MonadCache m => CacheOptions a -> m a -> m (PollingCache a)
-newPollingCache CacheOptions {..} generator = do
+newPollingCache cacheOptions generator = do
   tvar <- newTVarIO $ Left NotYetLoaded
+  newPollingCache' tvar cacheOptions generator
+
+-- | Like `newPollingCache`, but only returns after attempting the supplied action once.
+--
+-- If the action fails on the first try, the exception is thrown to the caller rather than
+-- starting up the background thread.
+newPrefilledPollingCache :: forall a m. MonadCache m => CacheOptions a -> m a -> m (PollingCache a)
+newPrefilledPollingCache cacheOptions generator = do
+  tvar <- newTVarIO $ Left NotYetLoaded
+  prefillResult <- handleCacheLoad cacheOptions generator tvar
+  case prefillResult of
+    Right _ -> newPollingCache' tvar cacheOptions generator
+    Left e -> throwIO e
+
+newPollingCache' :: forall a m. MonadCache m => CachePayload a -> CacheOptions a -> m a -> m (PollingCache a)
+newPollingCache' tvar cacheOptions@CacheOptions{..} generator = do
   tid <- newThread $ cacheThread tvar
   return $ PollingCache tvar tid
   where
     cacheThread :: CachePayload a -> m ()
     cacheThread tvar = repeatedly $ do
-      (result :: Either SomeException a) <- Exc.try generator
-      case result of
-        Left _ -> handleFailure failureMode tvar
-        Right value -> do
-          now <- currentTime
-          atomically . writeTVar tvar $ Right (value, now)
+      (result :: Either SomeException a) <- handleCacheLoad cacheOptions generator tvar
       handleDelay delayMode delayFuzzing result
+
+handleCacheLoad
+    :: forall a m. MonadCache m => CacheOptions a -> m a -> CachePayload a -> m (Either SomeException a)
+handleCacheLoad CacheOptions{..} generator tvar = do
+  (result :: Either SomeException a) <- Exc.try generator
+  case result of
+    Left x -> handleFailure failureMode tvar >> pure (Left x)
+    Right value -> do
+      now <- currentTime
+      atomically . writeTVar tvar $ Right (value, now)
+      pure (Right value)
 
 -- | Retrieve the current values from a 'PollingCache'.
 cachedValue :: MonadCache m => PollingCache a -> m (CacheResult a)

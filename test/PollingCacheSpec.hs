@@ -39,9 +39,10 @@ instance MonadCache (StateT TestState IO) where
     where
       step st@TestState {..} = st {numIterations = numIterations + 1}
       go = do
-        withStateT step act
         TestState {..} <- get
-        when (numIterations < maxIterations) go
+        when (numIterations < maxIterations) $ do
+          withStateT step act
+          go
   newThread act = act >> lift myThreadId
   killCache _ = return ()
 
@@ -105,6 +106,7 @@ spec = do
   delayDynamicallySpec
   delayDynamicallyWithBoundsSpec
   fuzzingSpec
+  prefillSpec
 
 basicFunctionalitySpec :: Spec
 basicFunctionalitySpec =
@@ -115,6 +117,11 @@ basicFunctionalitySpec =
         cache <- evalStateT testCache $ testState 4
         val <- cachedValue cache
         val `shouldBe` Right (123, testTime 300)
+
+      it "will not fill the cache until the background thread runs at least once" $ do
+        cache <- evalStateT testCache $ testState 0
+        val <- cachedValue cache
+        val `shouldBe` Left NotYetLoaded
 
     describe "after stopping cache" $ do
       it "will no longer return valid values" $ do
@@ -166,7 +173,8 @@ evictImmediatelySpec =
         (cache, st) <- runStateT testCache $ testState 1
         val <- cachedValue cache
         val `shouldBe` Right (123, testTime 0)
-        nextCache <- evalStateT testCache st
+        let modifiedSt = st{maxIterations = 2}
+        nextCache <- evalStateT testCache modifiedSt
         nextVal <- cachedValue nextCache
         nextVal `shouldBe` Right (123, testTime 10)
 
@@ -274,3 +282,16 @@ fuzzingSpec = context "Fuzzing" $ do
       cache <- evalStateT (testCache alwaysSucceeds) ts
       val <- cachedValue cache
       val `shouldBe` Right (123, testTime 24)
+
+prefillSpec :: Spec
+prefillSpec = context "Prefilling" $ do
+  describe "when successfully prefilling" $ do
+    let testCache = newPrefilledPollingCache (testOptions 100 Ignore) alwaysSucceeds
+    it "will return the cache which is already filled (even with zero iterations of the thread)" $ do
+      cache <- evalStateT testCache $ testState 0
+      val <- cachedValue cache
+      val `shouldBe` Right (123, testTime 0)
+  describe "when prefilling fails" $ do
+    it "will throw the exception instead of starting the cache" $ do
+      let newCache = newPrefilledPollingCache (testOptions 100 Ignore) alwaysFails
+      evalStateT newCache (testState 0) `shouldThrow` (const True :: Selector TestException)
